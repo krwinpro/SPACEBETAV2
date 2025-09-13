@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+:root {
+	--primary-color: #121212;
+	--primary-color-transparent: #121212e8;
+	--secondary-color: #292929;
+	--secondary-color-hover: #464950;
+	--primary-text-color: #fdfdfd;
+	--secondary-text-color: #b4bbc3;
+	--border-color: #fdfdfd2e;
+	--accent-color: #1e90ff;
+	--accent-color-hover: #106dca;
+	--accent-color-focus: #50a6fc;
+	accent-color: var(--accent-color);
+	--font-family: 'Lato', sans-serif;
+
+	--red-color: #FF8A80;
+	--pink-color: #FF80AB;
+	--purple-color: #EA80FC;
+	--blue-color: #8C9EFF;
+	--green-color: #B9F6CA;
+	--yellow-color: #FFFF8D;
+	--orange-color: #FFD180;
+	--brown-color: #4E342E;
+	--black-color: #000000;
+	--white-color: #ffffff;
+}
+
+body, html {
+	background: var(--primary-color);
+	color: var(--primary-text-color);
+	font-family: var(--font-family);
+	font-size: 18px;
+	width: 100%;
+}
+
+* {
+	box-sizing: border-box;
+	font-weight: 400;
+	margin: 0;
+}
+
+*:focus {
+	outline: none;
+}
+
+h1, h2, h3, h4, h5, h6, p, a, button, ul, ol, blockquote, table, .square, .circle, .triangle, .card, hr {
+	margin: 16px 0;
+	color: var(--primary-text-color);
+}
+
+button {
+	display: block;
+	background: var(--accent-color);
+	border: none;
+	border-radius: 4px;
+	padding: 10px;
+	cursor: pointer;
+	font-family: var(--font-family);
+	color: var(--primary-text-color);
+	transition: background 0.3s, transform 0.3s, border 0s;
+	font-size: 17px;
+}
+
+button:focus {
+	/* box-shadow: 0 0 0 3px var(--accent-color-focus); */
+}
+
+button:active {
+	transform: scale(1.05);
+	transition: 0.1s;
+}
+
+button.secondary {
+	background: var(--secondary-color-hover);
+}
+
+button.secondary:hover {
+	background: var(--secondary-color);
+}
+
+button.border {
+	background: transparent;
+	border: 2px solid var(--accent-color);
+	color: var(--accent-color);
+	padding: 8px;
+}
+
+button.border:hover {
+	background: var(--accent-color);
+	border: none;
+	color: var(--primary-text-color);
+	padding: 10px;
+}
+
+button.large {
+	padding: 20px;
+	font-size: 20px;
+}
+
+button.pill {
+	padding: 10px 30px;
+	border-radius: 20px;
+}
+
+button.disabled {
+	background: var(--secondary-color);
+	cursor: not-allowed;
+	color: var(--secondary-text-color);
+}
+
+button.disabled:active {
+	transform: none;
+}
