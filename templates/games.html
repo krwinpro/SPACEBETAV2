@@ -1,1 +1,26 @@
-
+{% extends 'base.html' %}
+{% block content %}
+<div class="text">감염 게임 목록</div>
+<style>
+    .crad{
+        box-sizing: border-box;
+        overflow: auto; /* 또는 scroll */
+        width: 100px;
+        height: 100px;
+        background-color: black;
+    }
+</style>
+<div style="margin-left: 18px;">
+    {% for game in games %}
+    <div class="card">
+        <img src="{{ game[0] }}" class="card-img-top" alt="Game image">
+        <div class="container">
+            <h5 class="card-title">{{ game[1] }}</h5>
+            <p class="card-text">{{ game[2] }}</p>
+            <p class="card-text"><small class="text-muted">Players: {{ game[3] }}</small></p>
+            <a href="{{ game[5] }}" class="btn btn-primary">Go to game</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
