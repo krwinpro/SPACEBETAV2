@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="editor-container">
+    <div class="editor-header">
+        <h1 class="editor-title">Script Execution</h1>
+    </div>
+    
+    <div class="button-container">
+        <button class="action-button execute-btn" id="execute">
+            <i class='bx bx-code-alt'></i>
+            <span>Execute</span>
+        </button>
+        <button class="action-button clear-btn" id="clear">
+            <i class='bx bx-trash'></i>
+            <span>Clear</span>
+        </button>
+        <button class="action-button r6-btn" id="r6">
+            <i class='bx bx-universal-access'></i>
+            <span>R6</span>
+        </button>
+        <button class="action-button respawn-btn" id="re">
+            <i class='bx bxs-analyse'></i>
+            <span>RE</span>
+        </button>
+    </div>
+    
+    <div class="editor-wrapper" id="editor"></div>
+</div>
+
+<style>
+.editor-container {
+    min-height: 100vh;
+    background: #1a1a2e;
+    padding: 24px;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+.editor-header {
+    margin-bottom: 24px;
+}
+
+.editor-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+}
+
+.button-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: white;
+}
+
+.action-button:hover {
+    transform: translateY(-1px);
+}
+
+.action-button:active {
+    transform: translateY(0);
+}
+
+.execute-btn {
+    background: #dc2626;
+}
+
+.execute-btn:hover {
+    background: #b91c1c;
+}
+
+.clear-btn {
+    background: #f59e0b;
+}
+
+.clear-btn:hover {
+    background: #d97706;
+}
+
+.r6-btn {
+    background: #3b82f6;
+}
+
+.r6-btn:hover {
+    background: #2563eb;
+}
+
+.respawn-btn {
+    background: #10b981;
+}
+
+.respawn-btn:hover {
+    background: #059669;
+}
+
+.editor-wrapper {
+    flex: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #374151;
+    min-height: 500px;
+}
+
+/* 모나코 에디터 커스텀 스타일 */
+.monaco-editor {
+    background: #111827 !important;
+}
+
+.monaco-editor .margin {
+    background: #111827 !important;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .editor-container {
+        padding: 16px;
+    }
+    
+    .editor-title {
+        font-size: 20px;
+    }
+    
+    .button-container {
+        justify-content: flex-start;
+    }
+    
+    .action-button {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+</style>
+
+<script src="https://unpkg.com/monaco-editor@latest/min/vs/loader.js"></script>
+<script>
+    require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@latest/min/vs' } });
+    require(['vs/editor/editor.main'], function () {
+        // 커스텀 테마 정의
+        monaco.editor.defineTheme('blacknuse-dark', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [
+                { token: 'comment', foreground: '6b7280', fontStyle: 'italic' },
+                { token: 'keyword', foreground: 'a78bfa', fontStyle: 'bold' },
+                { token: 'string', foreground: '34d399' },
+                { token: 'number', foreground: 'fbbf24' },
+                { token: 'operator', foreground: 'f87171' },
+                { token: 'function', foreground: '60a5fa' },
+                { token: 'variable', foreground: 'e5e7eb' }
+            ],
+            colors: {
+                'editor.background': '#111827',
+                'editor.foreground': '#e5e7eb',
+                'editorCursor.foreground': '#e5e7eb',
+                'editor.lineHighlightBackground': '#1f2937',
+                'editorLineNumber.foreground': '#6b7280',
+                'editor.selectionBackground': '#374151',
+                'editor.inactiveSelectionBackground': '#37415150',
+                'editorIndentGuide.background': '#374151',
+                'editorIndentGuide.activeBackground': '#4b5563'
+            }
+        });
+
+        // 에디터 생성
+        var editor = monaco.editor.create(document.getElementById('editor'), {
+            value: '',
+            language: 'lua',
+            theme: 'blacknuse-dark',
+            fontSize: 14,
+            fontFamily: 'JetBrains Mono, Consolas, monospace',
+            automaticLayout: true,
+            minimap: {
+                enabled: false
+            },
+            scrollbar: {
+                useShadows: false,
+                verticalScrollbarSize: 8,
+                horizontalScrollbarSize: 8
+            },
+            lineNumbers: 'on',
+            renderLineHighlight: 'line',
+            selectOnLineNumbers: true
+        });
+
+        // 버튼 이벤트 리스너
+        document.getElementById('clear').addEventListener('click', function () {
+            editor.setValue('');
+        });
+        
+        document.getElementById('execute').addEventListener('click', function () {
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> <span>실행 중...</span>';
+            
+            var editor_value = editor.getValue();
+
+            fetch('{{ url_for("save_script") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ script: editor_value })
+            })
+                .then(function (response) {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    throw new Error('Request failed');
+                })
+                .then(function (response_text) {
+                    Swal.fire({
+                        title: '✅ 성공!',
+                        text: response_text,
+                        icon: 'success',
+                        background: '#16213e',
+                        color: 'white',
+                        confirmButtonColor: '#6366f1'
+                    });
+                    
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bx bx-code-alt"></i> <span>Execute</span>';
+                })
+                .catch(function (error) {
+                    Swal.fire({
+                        title: '❌ 오류',
+                        text: '스크립트 전송 중 문제가 발생했습니다.',
+                        icon: 'error',
+                        background: '#16213e',
+                        color: 'white',
+                        confirmButtonColor: '#6366f1'
+                    });
+                    console.error('Error:', error);
+                    
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bx bx-code-alt"></i> <span>Execute</span>';
+                });
+        });
+        
+        document.getElementById('r6').addEventListener('click', function () {
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> <span>실행 중...</span>';
+            
+            var editor_value = "r6"
+
+            fetch('{{ url_for("save_script") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ script: editor_value })
+            })
+                .then(function (response) {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    throw new Error('Request failed');
+                })
+                .then(function (response_text) {
+                    Swal.fire({
+                        title: '✅ 성공!',
+                        text: response_text,
+                        icon: 'success',
+                        background: '#16213e',
+                        color: 'white',
+                        confirmButtonColor: '#6366f1'
+                    });
+                    
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bx bx-universal-access"></i> <span>R6</span>';
+                })
+                .catch(function (error) {
+                    Swal.fire({
+                        title: '❌ 오류',
+                        text: '스크립트 전송 중 문제가 발생했습니다.',
+                        icon: 'error',
+                        background: '#16213e',
+                        color: 'white',
+                        confirmButtonColor: '#6366f1'
+                    });
+                    console.error('Error:', error);
+                    
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bx bx-universal-access"></i> <span>R6</span>';
+                });
+        });
+        
+        document.getElementById('re').addEventListener('click', function () {
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> <span>실행 중...</span>';
+            
+            var editor_value = "game.Players.ROBLOXNAME:LoadCharacter()"
+
+            fetch('{{ url_for("save_script") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ script: editor_value })
+            })
+                .then(function (response) {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    throw new Error('Request failed');
+                })
+                .then(function (response_text) {
+                    Swal.fire({
+                        title: '✅ 성공!',
+                        text: response_text,
+                        icon: 'success',
+                        background: '#16213e',
+                        color: 'white',
+                        confirmButtonColor: '#6366f1'
+                    });
+                    
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bx bxs-analyse"></i> <span>RE</span>';
+                })
+                .catch(function (error) {
+                    Swal.fire({
+                        title: '❌ 오류',
+                        text: '스크립트 전송 중 문제가 발생했습니다.',
+                        icon: 'error',
+                        background: '#16213e',
+                        color: 'white',
+                        confirmButtonColor: '#6366f1'
+                    });
+                    console.error('Error:', error);
+                    
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bx bxs-analyse"></i> <span>RE</span>';
+                });
+        });
+    });
+</script>
+{% endblock %}

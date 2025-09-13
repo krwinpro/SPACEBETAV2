@@ -1,0 +1,611 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="script-hub-container">
+    <div class="hub-header">
+        <h1 class="hub-title">
+            <i class='bx bx-grid-alt'></i>
+            스크립트 허브
+        </h1>
+        <p class="hub-subtitle">30+ 개의 프리미엄 로블록스 스크립트를 한 곳에서</p>
+    </div>
+    
+    <div class="search-container">
+        <div class="search-wrapper">
+            <i class='bx bx-search search-icon'></i>
+            <input type="text" id="searchInput" placeholder="스크립트 검색..." class="search-input">
+            <div class="search-results-count" id="resultsCount">35개 스크립트</div>
+        </div>
+    </div>
+    
+    <div class="scripts-grid" id="scriptContainer">
+        <!-- 스크립트 카드들이 여기에 동적으로 생성됩니다 -->
+    </div>
+    
+    <div class="no-results" id="noResults" style="display: none;">
+        <i class='bx bx-search-alt-2'></i>
+        <h3>검색 결과가 없습니다</h3>
+        <p>다른 키워드로 검색해보세요</p>
+    </div>
+</div>
+
+<style>
+.script-hub-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+    padding: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hub-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.hub-title {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.hub-title i {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hub-subtitle {
+    color: #a0a0a0;
+    font-size: 1.2rem;
+    font-weight: 300;
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    color: white;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+}
+
+.search-icon {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a0a0a0;
+    font-size: 1.3rem;
+    transition: color 0.3s ease;
+}
+
+.search-input:focus + .search-icon {
+    color: #667eea;
+}
+
+.search-results-count {
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a0a0a0;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
+}
+
+.scripts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 1rem;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.scripts-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scripts-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.scripts-grid::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+}
+
+.script-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.script-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.script-card:hover::before {
+    left: 100%;
+}
+
+.script-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #667eea;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(102, 126, 234, 0.2);
+}
+
+.script-card.executing {
+    animation: pulse 1.5s infinite;
+    border-color: #4ade80;
+    box-shadow: 0 0 30px rgba(74, 222, 128, 0.3);
+}
+
+.script-icon-wrapper {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.script-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.script-card:hover .script-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+}
+
+.script-name {
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    line-height: 1.3;
+}
+
+.script-preview {
+    color: #a0a0a0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    max-height: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.script-card:hover .script-preview {
+    color: #c0c0c0;
+}
+
+.execute-button {
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    opacity: 0;
+}
+
+.script-card:hover .execute-button {
+    bottom: 1rem;
+    opacity: 1;
+}
+
+.execute-button:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.no-results {
+    text-align: center;
+    color: #a0a0a0;
+    padding: 4rem 2rem;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.no-results i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.no-results h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 30px rgba(74, 222, 128, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 50px rgba(74, 222, 128, 0.6);
+    }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .script-hub-container {
+        padding: 1rem;
+    }
+    
+    .hub-title {
+        font-size: 2rem;
+    }
+    
+    .scripts-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .script-card {
+        padding: 1.2rem;
+    }
+}
+</style>
+
+<script>
+const scripts = [
+    {
+        "name": "Dex",
+        "icon": "externa/imagen/Dex.png",
+        "script": "require(14572394952)('RBLX_USERNAME') wait(5) game:GetService('Players').Name = 'Players'"
+    },
+    {
+        "name": "Respawn",
+        "icon": "externa/imagen/rwfresh.png",
+        "script": "game:GetService('Players').RBLX_USERNAME:LoadCharacter()"
+    },
+    {
+        "name": "R6",
+        "icon": "externa/imagen/script.png",
+        "script": "require(3436957371):r6('RBLX_USERNAME')"
+    },
+    {
+        "name": "Katanirst",
+        "icon": "externa/imagen/script.png",
+        "script": "require(8038057972).CLoad('RBLX_USERNAME')"
+    },
+    {
+        "name": "Refinery",
+        "icon": "externa/imagen/script.png",
+        "script": "require(14080317322).Refinary()"
+    },
+    {
+        "name": "The Button",
+        "icon": "externa/imagen/script.png",
+        "script": "require(14314013653):button('RBLX_USERNAME')"
+    },
+    {
+        "name": "War Helicopter",
+        "icon": "externa/imagen/script.png",
+        "script": "require(12620186035).Huey('RBLX_USERNAME')"
+    },
+    {
+        "name": "FakeVR",
+        "icon": "externa/imagen/script.png",
+        "script": "require(6223977609)['FakeVr']('RBLX_USERNAME')"
+    },
+    {
+        "name": "Infinite Yield",
+        "icon": "externa/imagen/script.png",
+        "script": "깨끗하고 사용하기 간편한 재미있는 관리자 명령어"
+    },
+    {
+        "name": "Reality Glitcher",
+        "icon": "externa/imagen/script.png",
+        "script": "require(6223977609)['RealityGlitcher']('RBLX_USERNAME')"
+    },
+    {
+        "name": "CHANCE",
+        "icon": "externa/imagen/script.png",
+        "script": "require(6223977609)['Chance']('RBLX_USERNAME')"
+    },
+    {
+        "name": "Tesseract",
+        "icon": "externa/imagen/script.png",
+        "script": "require(6223977609)['Tesseract']('RBLX_USERNAME')"
+    },
+    {
+        "name": "Banana",
+        "icon": "externa/imagen/script.png",
+        "script": "require(6223977609)['Banana']('RBLX_USERNAME')"
+    },
+    {
+        "name": "Mr Bye Bye",
+        "icon": "externa/imagen/script.png",
+        "script": "require(6515226671).load('RBLX_USERNAME') "
+    },
+    {
+        "name": "Mr Bye Bye Mini",
+        "icon": "externa/imagen/script.png",
+        "script": "require(5629629397).load('RBLX_USERNAME') "
+    },
+    {
+        "name": "Mr Bye Bye Giant",
+        "icon": "externa/imagen/script.png",
+        "script": "require(5630545228).load('RBLX_USERNAME') "
+    },
+    {
+        "name": "Lost Psygen",
+        "icon": "externa/imagen/script.png",
+        "script": "require(6223977609)['Lost Psygen']('RBLX_USERNAME')"
+    },
+    {
+        "name": "Ban Hammer",
+        "icon": "externa/imagen/banhammer.png",
+        "script": "require(5448035802).Hammer('RBLX_USERNAME','BanHammer')"
+    },
+    {
+        "name": "Lunatic",
+        "icon": "externa/imagen/lunatic.png",
+        "script": "require(5813708464).load('RBLX_USERNAME')"
+    },
+    {
+        "name": "Reality Orb",
+        "icon": "externa/imagen/orb.png",
+        "script": "require(4780399515).load('RBLX_USERNAME')"
+    },
+    {
+        "name": "Siren Head",
+        "icon": "externa/imagen/siren.png",
+        "script": "require(5239955586).Dark('RBLX_USERNAME')"
+    },
+    {
+        "name": "SledgeHammer",
+        "icon": "externa/imagen/hammer.png",
+        "script": "require(8038037940).CLoad('RBLX_USERNAME')"
+    },
+    {
+        "name": "Mystic Tools",
+        "icon": "externa/imagen/mystic.png",
+        "script": "require(4780399515).load('RBLX_USERNAME')"
+    },
+    {
+        "name": "Topkek V3",
+        "icon": "externa/imagen/TopKek.png",
+        "script": "require(2609384717).load('RBLX_USERNAME')"
+    },
+    {
+        "name": "K00pkidd gui",
+        "icon": "externa/imagen/k00p.png",
+        "script": "require(12313085498).pipiu('RBLX_USERNAME')"
+    },
+    {
+        "name": "doges",
+        "icon": "externa/imagen/doge.png",
+        "script": "require(5115249013).fehack('RBLX_USERNAME')"
+    },
+    {
+        "name": "RopeWeb",
+        "icon": "externa/imagen/ball.png",
+        "script": "require(15884743161).RopeBall('RBLX_USERNAME')"
+    },
+    {
+        "name": "Wasp Fighter Jet",
+        "icon": "externa/imagen/wasp.png",
+        "script": "require(5860060462).load('RBLX_USERNAME')"
+    },
+    {
+        "name": "Wild Katana",
+        "icon": "externa/imagen/script.png",
+        "script": "require(14175063457)('RBLX_USERNAME')"
+    },
+    {
+        "name": "Gun Journer",
+        "icon": "externa/imagen/script.png",
+        "script": "require(14175074837)('RBLX_USERNAME')"
+    },
+    {
+        "name": "Bow Master",
+        "icon": "externa/imagen/script.png",
+        "script": "require(14175067340)('RBLX_USERNAME')"
+    },
+    {
+        "name": "Abyss Eye",
+        "icon": "externa/imagen/script.png",
+        "script": "require(14175105993)('RBLX_USERNAME')"
+    },
+    {
+        "name": "Wiron",
+        "icon": "externa/imagen/script.png",
+        "script": "require(7972125129).CLoad('RBLX_USERNAME')"
+    },
+    {
+        "name": "Road Rogue",
+        "icon": "externa/imagen/script.png",
+        "script": "require(7473216460).load('RBLX_USERNAME')"
+    },
+    {
+        "name": "Tiny Infernous",
+        "icon": "externa/imagen/script.png",
+        "script": "require(8828734242)('RBLX_USERNAME')"
+    }
+];
+
+function executeScript(script, cardElement) {
+    // 실행 중 상태 표시
+    cardElement.classList.add('executing');
+    
+    fetch('{{ url_for("save_script") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ script: script })
+    })
+    .then(function (response) {
+        if (response.ok) {
+            return response.text();
+        }
+        throw new Error('Request failed');
+    })
+    .then(function (response_text) {
+        cardElement.classList.remove('executing');
+        Swal.fire({
+            title: '✅ 성공!',
+            text: response_text,
+            icon: 'success',
+            background: '#1a1a2e',
+            color: 'white',
+            confirmButtonColor: '#667eea'
+        });
+    })
+    .catch(function (error) {
+        cardElement.classList.remove('executing');
+        Swal.fire({
+            title: '❌ 오류',
+            text: '스크립트 전송 중 문제가 발생했습니다.',
+            icon: 'error',
+            background: '#1a1a2e',
+            color: 'white',
+            confirmButtonColor: '#667eea'
+        });
+        console.error('Error:', error);
+    });
+}
+
+function createScriptCard(script) {
+    const card = document.createElement('div');
+    card.className = 'script-card';
+    
+    card.innerHTML = `
+        <div class="script-icon-wrapper">
+            <img src="${script.icon}" alt="${script.name}" class="script-icon" 
+                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTUiIGZpbGw9InVybCgjZ3JhZGllbnQpIi8+CjxwYXRoIGQ9Ik0zMCAyMEwzMCA0ME0yMCAzMEw0MCAzMCIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzY2N2VlYSIvPgo8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM3NjRiYTIiLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4='">
+        </div>
+        <div class="script-name">${script.name}</div>
+        <div class="script-preview">${script.script.substring(0, 80)}...</div>
+        <button class="execute-button" onclick="event.stopPropagation();">
+            <i class='bx bx-play'></i> 실행
+        </button>
+    `;
+    
+    card.onclick = () => executeScript(script.script, card);
+    
+    return card;
+}
+
+function renderScripts(scriptsToRender) {
+    const container = document.getElementById('scriptContainer');
+    const noResults = document.getElementById('noResults');
+    const resultsCount = document.getElementById('resultsCount');
+    
+    container.innerHTML = '';
+    
+    if (scriptsToRender.length === 0) {
+        noResults.style.display = 'block';
+        resultsCount.textContent = '0개 스크립트';
+    } else {
+        noResults.style.display = 'none';
+        resultsCount.textContent = `${scriptsToRender.length}개 스크립트`;
+        
+        scriptsToRender.forEach((script, index) => {
+            const card = createScriptCard(script);
+            card.style.animationDelay = `${index * 0.05}s`;
+            container.appendChild(card);
+        });
+    }
+}
+
+function filterScripts() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const filteredScripts = scripts.filter(script => 
+        script.name.toLowerCase().includes(searchTerm)
+    );
+    renderScripts(filteredScripts);
+}
+
+// 초기 렌더링
+document.addEventListener('DOMContentLoaded', function() {
+    renderScripts(scripts);
+    
+    // 검색 기능
+    document.getElementById('searchInput').addEventListener('input', filterScripts);
+});
+</script>
+{% endblock %}

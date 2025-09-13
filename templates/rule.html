@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if plan == 'Premium' %}
+<div class="text">Premium 규칙</div><br>
+<div class="text" style="margin-top: -5px; margin-left: 30px;">
+    1. 감염된 게임 유출 금지<br>
+    2. 맵을 심각하게 파괴 할 수 있는 스크립트는 실행 금지<br>
+    3. 서버사이드 감염 사실 언급 금지<br>
+    4. 서버사이드 이름 언급 금지<br>
+    5. 허위 신고 금지<br>
+</div>
+{% elif plan == 'Whitelist' %}
+<div class="text">Whitelist 규칙</div><br>
+<div class="text" style="margin-top: -5px; margin-left: 30px;">
+    1. 감염된 게임 유출 금지<br>
+    2. 맵을 심각하게 파괴 할 수 있는 스크립트는 실행 금지<br>
+    3. 서버사이드 감염 사실 언급 금지<br>
+    4. 서버사이드 이름 언급 금지<br>
+    5. 허위 신고 금지<br>
+    6. 학살이나 스폰킬은 금지<br>
+    7. 킥,벤,서버락 금지<br>
+    8. 맵 변형,맵 배경 변형 금지<br>
+    9. 학살이나 스폰킬은 금지<br>
+    10. all 금지 EX) :bring all, :kill all
+</div>
+{% endif %}
+{% endblock %}

